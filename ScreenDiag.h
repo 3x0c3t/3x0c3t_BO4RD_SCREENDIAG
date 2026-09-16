@@ -22,7 +22,9 @@ struct TouchCalibration {
 // SCREEN INFORMATION
 // ========================================
 
-void printScreenInfo(TFT_eSPI &tft) {
+void printScreenInfo(
+  TFT_eSPI &tft
+) {
 
   Serial.println();
 
@@ -42,7 +44,9 @@ void printScreenInfo(TFT_eSPI &tft) {
 // BASIC SCREEN TEST
 // ========================================
 
-void testScreen(TFT_eSPI &tft) {
+void testScreen(
+  TFT_eSPI &tft
+) {
 
   Serial.println("TEST ECRAN");
 
@@ -60,7 +64,10 @@ void testScreen(TFT_eSPI &tft) {
 
   tft.fillScreen(TFT_BLACK);
 
-  Serial.println("Screen diagnostic complete");
+  Serial.println(
+    "Screen diagnostic complete"
+  );
+
   Serial.println();
 }
 
@@ -68,20 +75,60 @@ void testScreen(TFT_eSPI &tft) {
 // COLOR BARS
 // ========================================
 
-void testColorBars(TFT_eSPI &tft) {
+void testColorBars(
+  TFT_eSPI &tft
+) {
 
   Serial.println("TEST COULEURS");
 
-  int16_t width = tft.width();
-  int16_t height = tft.height();
+  int16_t width =
+    tft.width();
 
-  int16_t barHeight = height / 6;
+  int16_t height =
+    tft.height();
 
-  tft.fillRect(0, 0, width, barHeight, TFT_RED);
-  tft.fillRect(0, barHeight, width, barHeight, TFT_GREEN);
-  tft.fillRect(0, barHeight * 2, width, barHeight, TFT_BLUE);
-  tft.fillRect(0, barHeight * 3, width, barHeight, TFT_CYAN);
-  tft.fillRect(0, barHeight * 4, width, barHeight, TFT_MAGENTA);
+  int16_t barHeight =
+    height / 6;
+
+  tft.fillRect(
+    0,
+    0,
+    width,
+    barHeight,
+    TFT_RED
+  );
+
+  tft.fillRect(
+    0,
+    barHeight,
+    width,
+    barHeight,
+    TFT_GREEN
+  );
+
+  tft.fillRect(
+    0,
+    barHeight * 2,
+    width,
+    barHeight,
+    TFT_BLUE
+  );
+
+  tft.fillRect(
+    0,
+    barHeight * 3,
+    width,
+    barHeight,
+    TFT_CYAN
+  );
+
+  tft.fillRect(
+    0,
+    barHeight * 4,
+    width,
+    barHeight,
+    TFT_MAGENTA
+  );
 
   tft.fillRect(
     0,
@@ -100,14 +147,21 @@ void testColorBars(TFT_eSPI &tft) {
 // GEOMETRY TEST
 // ========================================
 
-void testGeometry(TFT_eSPI &tft) {
+void testGeometry(
+  TFT_eSPI &tft
+) {
 
   Serial.println("TEST GEOMETRIE");
 
-  int16_t width = tft.width();
-  int16_t height = tft.height();
+  int16_t width =
+    tft.width();
 
-  tft.fillScreen(TFT_BLACK);
+  int16_t height =
+    tft.height();
+
+  tft.fillScreen(
+    TFT_BLACK
+  );
 
   tft.drawRect(
     0,
@@ -140,8 +194,15 @@ void testGeometry(TFT_eSPI &tft) {
     TFT_CYAN
   );
 
-  tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.setTextDatum(
+    MC_DATUM
+  );
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
   tft.setTextSize(2);
 
   tft.drawString(
@@ -150,53 +211,133 @@ void testGeometry(TFT_eSPI &tft) {
     height / 2
   );
 
-  tft.setTextDatum(TL_DATUM);
+  tft.setTextDatum(
+    TL_DATUM
+  );
 
   delay(1500);
 
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(
+    TFT_BLACK
+  );
 }
 
 // ========================================
-// CALIBRATION POINT
+// CALIBRATION TARGET
 // ========================================
 
-void drawCalibrationPoint(
+void drawCalibrationTarget(
   TFT_eSPI &tft,
   int16_t x,
-  int16_t y
+  int16_t y,
+  uint8_t pointNumber
 ) {
 
-  tft.fillScreen(TFT_BLACK);
+  int16_t width =
+    tft.width();
+
+  int16_t height =
+    tft.height();
+
+  tft.fillScreen(
+    TFT_BLACK
+  );
+
+  // ======================================
+  // TITLE
+  // ======================================
+
+  tft.setTextDatum(
+    TC_DATUM
+  );
+
+  tft.setTextColor(
+    TFT_CYAN,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(2);
+
+  tft.drawString(
+    "TOUCH 4 POINTS",
+    width / 2,
+    8
+  );
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
+  tft.drawString(
+    String(pointNumber) + " / 4",
+    width / 2,
+    34
+  );
+
+  // ======================================
+  // TARGET
+  // ======================================
 
   tft.drawLine(
-    x - 12,
+    x - 15,
     y,
-    x + 12,
+    x + 15,
     y,
     TFT_WHITE
   );
 
   tft.drawLine(
     x,
-    y - 12,
+    y - 15,
     x,
-    y + 12,
+    y + 15,
     TFT_WHITE
   );
 
   tft.drawCircle(
     x,
     y,
-    6,
+    8,
     TFT_RED
   );
 
   tft.fillCircle(
     x,
     y,
-    2,
+    3,
     TFT_YELLOW
+  );
+
+  // ======================================
+  // REQUESTED COORDINATES
+  // ======================================
+
+  tft.setTextColor(
+    TFT_YELLOW,
+    TFT_BLACK
+  );
+
+  tft.drawString(
+    "DEMANDE",
+    width / 2,
+    height / 2 - 40
+  );
+
+  tft.drawString(
+    "X: " + String(x),
+    width / 2,
+    height / 2 - 15
+  );
+
+  tft.drawString(
+    "Y: " + String(y),
+    width / 2,
+    height / 2 + 10
+  );
+
+  tft.setTextDatum(
+    TL_DATUM
   );
 }
 
@@ -207,32 +348,61 @@ void drawCalibrationPoint(
 bool waitForTouch(
   XPT2046_Touchscreen &touch,
   int16_t &rawX,
-  int16_t &rawY
+  int16_t &rawY,
+  int16_t &pressure
 ) {
 
-  unsigned long startTime = millis();
+  unsigned long startTime =
+    millis();
 
-  while (millis() - startTime < 15000) {
+  while (
+    millis() - startTime < 15000
+  ) {
 
     if (touch.touched()) {
 
-      TS_Point p = touch.getPoint();
+      TS_Point p =
+        touch.getPoint();
 
-      rawX = p.x;
-      rawY = p.y;
+      rawX =
+        p.x;
 
-      Serial.print("RAW X=");
-      Serial.print(rawX);
+      rawY =
+        p.y;
 
-      Serial.print(" RAW Y=");
-      Serial.print(rawY);
+      pressure =
+        p.z;
 
-      Serial.print(" Z=");
-      Serial.println(p.z);
+      Serial.print(
+        "RAW X="
+      );
+
+      Serial.print(
+        rawX
+      );
+
+      Serial.print(
+        " RAW Y="
+      );
+
+      Serial.print(
+        rawY
+      );
+
+      Serial.print(
+        " Z="
+      );
+
+      Serial.println(
+        pressure
+      );
 
       delay(300);
 
-      while (touch.touched()) {
+      while (
+        touch.touched()
+      ) {
+
         delay(20);
       }
 
@@ -248,6 +418,74 @@ bool waitForTouch(
 }
 
 // ========================================
+// TOUCH CONVERSION
+// ========================================
+
+void convertTouch(
+  TFT_eSPI &tft,
+  TouchCalibration &cal,
+  int16_t rawX,
+  int16_t rawY,
+  int16_t &screenX,
+  int16_t &screenY
+) {
+
+  if (
+    cal.rawRight !=
+    cal.rawLeft
+  ) {
+
+    screenX =
+      map(
+        rawX,
+        cal.rawLeft,
+        cal.rawRight,
+        0,
+        tft.width() - 1
+      );
+
+  } else {
+
+    screenX =
+      tft.width() / 2;
+  }
+
+  if (
+    cal.rawBottom !=
+    cal.rawTop
+  ) {
+
+    screenY =
+      map(
+        rawY,
+        cal.rawTop,
+        cal.rawBottom,
+        0,
+        tft.height() - 1
+      );
+
+  } else {
+
+    screenY =
+      tft.height() / 2;
+  }
+
+  screenX =
+    constrain(
+      screenX,
+      0,
+      tft.width() - 1
+    );
+
+  screenY =
+    constrain(
+      screenY,
+      0,
+      tft.height() - 1
+    );
+}
+
+// ========================================
 // TOUCH CALIBRATION
 // ========================================
 
@@ -257,169 +495,758 @@ bool calibrateTouch(
   TouchCalibration &cal
 ) {
 
-  Serial.println();
-  Serial.println("==============================");
-  Serial.println("TACTILE CALIBRATION");
-  Serial.println("==============================");
+  int16_t width =
+    tft.width();
 
-  Serial.print("Rotation TFT   : ");
-  Serial.println(TFT_ROTATION);
+  int16_t height =
+    tft.height();
 
-  Serial.print("Rotation TOUCH : ");
-  Serial.println(TFT_ROTATION);
+  const int16_t margin = 25;
 
-  Serial.println();
-  Serial.println("Calibration en 4 points.");
-  Serial.println();
+  // ======================================
+  // TARGETS
+  // ======================================
 
-  int16_t width = tft.width();
-  int16_t height = tft.height();
+  int16_t targetX[4] = {
 
-  const int16_t margin = 20;
-
-  int16_t pointsX[4] = {
     margin,
     width - margin,
     width - margin,
     margin
+
   };
 
-  int16_t pointsY[4] = {
+  int16_t targetY[4] = {
+
     margin,
     margin,
     height - margin,
     height - margin
+
   };
+
+  // ======================================
+  // RAW VALUES
+  // ======================================
 
   int16_t rawX[4];
   int16_t rawY[4];
+  int16_t rawZ[4];
 
-  for (uint8_t i = 0; i < 4; i++) {
+  // ======================================
+  // SERIAL HEADER
+  // ======================================
 
-    Serial.print("Point ");
-    Serial.print(i + 1);
-    Serial.println("/4");
+  Serial.println();
+  Serial.println(
+    "================================"
+  );
 
-    drawCalibrationPoint(
-      tft,
-      pointsX[i],
-      pointsY[i]
+  Serial.println(
+    "        TOUCH 4 POINTS"
+  );
+
+  Serial.println(
+    "================================"
+  );
+
+  Serial.print(
+    "Rotation TFT   : "
+  );
+
+  Serial.println(
+    TFT_ROTATION
+  );
+
+  Serial.print(
+    "Rotation TOUCH : "
+  );
+
+  Serial.println(
+    TFT_ROTATION
+  );
+
+  Serial.println();
+
+  // ======================================
+  // FOUR POINTS
+  // ======================================
+
+  for (
+    uint8_t i = 0;
+    i < 4;
+    i++
+  ) {
+
+    Serial.println(
+      "--------------------------------"
     );
 
-    Serial.print("Touchez le point : ");
-    Serial.print(pointsX[i]);
-    Serial.print(" , ");
-    Serial.println(pointsY[i]);
+    Serial.print(
+      "POINT "
+    );
 
-    if (!waitForTouch(
-      touch,
-      rawX[i],
-      rawY[i]
-    )) {
+    Serial.print(
+      i + 1
+    );
+
+    Serial.println(
+      " / 4"
+    );
+
+    Serial.print(
+      "COORDONNEE DEMANDEE : X="
+    );
+
+    Serial.print(
+      targetX[i]
+    );
+
+    Serial.print(
+      " Y="
+    );
+
+    Serial.println(
+      targetY[i]
+    );
+
+    Serial.println(
+      "Touchez la cible."
+    );
+
+    drawCalibrationTarget(
+      tft,
+      targetX[i],
+      targetY[i],
+      i + 1
+    );
+
+    if (
+      !waitForTouch(
+        touch,
+        rawX[i],
+        rawY[i],
+        rawZ[i]
+      )
+    ) {
 
       Serial.println();
-      Serial.println("Timeout calibration.");
+      Serial.println(
+        "TIMEOUT CALIBRATION"
+      );
+
+      tft.fillScreen(
+        TFT_BLACK
+      );
+
+      tft.setTextDatum(
+        MC_DATUM
+      );
+
+      tft.setTextColor(
+        TFT_RED,
+        TFT_BLACK
+      );
+
+      tft.setTextSize(2);
+
+      tft.drawString(
+        "CALIBRATION TIMEOUT",
+        width / 2,
+        height / 2
+      );
+
+      tft.setTextDatum(
+        TL_DATUM
+      );
 
       return false;
     }
 
-    Serial.println();
+    Serial.print(
+      "COORDONNEE REELLE RAW : X="
+    );
+
+    Serial.print(
+      rawX[i]
+    );
+
+    Serial.print(
+      " Y="
+    );
+
+    Serial.println(
+      rawY[i]
+    );
+
+    Serial.print(
+      "PRESSION : "
+    );
+
+    Serial.println(
+      rawZ[i]
+    );
+
+    delay(300);
   }
+
+  // ======================================
+  // BUILD CALIBRATION
+  // ======================================
 
   cal.rawLeft =
-    ((int32_t)rawX[0] + rawX[3]) / 2;
+    (
+      (int32_t)rawX[0] +
+      rawX[3]
+    ) / 2;
 
   cal.rawRight =
-    ((int32_t)rawX[1] + rawX[2]) / 2;
+    (
+      (int32_t)rawX[1] +
+      rawX[2]
+    ) / 2;
 
   cal.rawTop =
-    ((int32_t)rawY[0] + rawY[1]) / 2;
+    (
+      (int32_t)rawY[0] +
+      rawY[1]
+    ) / 2;
 
   cal.rawBottom =
-    ((int32_t)rawY[2] + rawY[3]) / 2;
+    (
+      (int32_t)rawY[2] +
+      rawY[3]
+    ) / 2;
+
+  // ======================================
+  // RAW CALIBRATION VALUES
+  // ======================================
 
   Serial.println();
-  Serial.println("CALIBRATION RAW VALUES");
+  Serial.println(
+    "================================"
+  );
 
-  Serial.print("rawLeft   : ");
-  Serial.println(cal.rawLeft);
+  Serial.println(
+    "CALIBRATION RAW VALUES"
+  );
 
-  Serial.print("rawRight  : ");
-  Serial.println(cal.rawRight);
+  Serial.println(
+    "================================"
+  );
 
-  Serial.print("rawTop    : ");
-  Serial.println(cal.rawTop);
+  Serial.print(
+    "rawLeft   : "
+  );
 
-  Serial.print("rawBottom : ");
-  Serial.println(cal.rawBottom);
+  Serial.println(
+    cal.rawLeft
+  );
+
+  Serial.print(
+    "rawRight  : "
+  );
+
+  Serial.println(
+    cal.rawRight
+  );
+
+  Serial.print(
+    "rawTop    : "
+  );
+
+  Serial.println(
+    cal.rawTop
+  );
+
+  Serial.print(
+    "rawBottom : "
+  );
+
+  Serial.println(
+    cal.rawBottom
+  );
+
+  // ======================================
+  // FINAL PRECISION CALCULATION
+  // ======================================
+
+  float precision[4];
+
+  float totalPrecision =
+    0.0;
+
+  float maxDistance =
+    sqrt(
+      (
+        (float)(width - 1) *
+        (float)(width - 1)
+      )
+      +
+      (
+        (float)(height - 1) *
+        (float)(height - 1)
+      )
+    );
+
+  int16_t measuredX[4];
+  int16_t measuredY[4];
+
+  float distance[4];
+
+  // ======================================
+  // CALCULATE EACH POINT
+  // ======================================
+
+  for (
+    uint8_t i = 0;
+    i < 4;
+    i++
+  ) {
+
+    convertTouch(
+      tft,
+      cal,
+      rawX[i],
+      rawY[i],
+      measuredX[i],
+      measuredY[i]
+    );
+
+    float dx =
+      (float)measuredX[i] -
+      (float)targetX[i];
+
+    float dy =
+      (float)measuredY[i] -
+      (float)targetY[i];
+
+    distance[i] =
+      sqrt(
+        (dx * dx) +
+        (dy * dy)
+      );
+
+    precision[i] =
+      100.0 -
+      (
+        distance[i] /
+        maxDistance
+      ) *
+      100.0;
+
+    precision[i] =
+      constrain(
+        precision[i],
+        0.0,
+        100.0
+      );
+
+    totalPrecision +=
+      precision[i];
+  }
+
+  float finalPrecision =
+    totalPrecision / 4.0;
+
+  // ======================================
+  // SERIAL FINAL REPORT
+  // ======================================
 
   Serial.println();
+  Serial.println(
+    "================================"
+  );
 
-  tft.fillScreen(TFT_BLACK);
+  Serial.println(
+    "       BILAN TOUCH 4 POINTS"
+  );
+
+  Serial.println(
+    "================================"
+  );
+
+  for (
+    uint8_t i = 0;
+    i < 4;
+    i++
+  ) {
+
+    Serial.println();
+
+    Serial.print(
+      "POINT "
+    );
+
+    Serial.println(
+      i + 1
+    );
+
+    Serial.print(
+      " Demande : X="
+    );
+
+    Serial.print(
+      targetX[i]
+    );
+
+    Serial.print(
+      " Y="
+    );
+
+    Serial.println(
+      targetY[i]
+    );
+
+    Serial.print(
+      " RAW     : X="
+    );
+
+    Serial.print(
+      rawX[i]
+    );
+
+    Serial.print(
+      " Y="
+    );
+
+    Serial.println(
+      rawY[i]
+    );
+
+    Serial.print(
+      " Reel    : X="
+    );
+
+    Serial.print(
+      measuredX[i]
+    );
+
+    Serial.print(
+      " Y="
+    );
+
+    Serial.println(
+      measuredY[i]
+    );
+
+    Serial.print(
+      " Erreur  : "
+    );
+
+    Serial.print(
+      distance[i],
+      1
+    );
+
+    Serial.println(
+      " px"
+    );
+
+    Serial.print(
+      " Precision : "
+    );
+
+    Serial.print(
+      precision[i],
+      1
+    );
+
+    Serial.println(
+      " %"
+    );
+  }
+
+  // ======================================
+  // FINAL SERIAL SCORE
+  // ======================================
+
+  Serial.println();
+  Serial.println(
+    "--------------------------------"
+  );
+
+  Serial.print(
+    "PRECISION MOYENNE : "
+  );
+
+  Serial.print(
+    finalPrecision,
+    1
+  );
+
+  Serial.println(
+    " %"
+  );
+
+  Serial.print(
+    "BILAN : "
+  );
+
+  if (
+    finalPrecision >= 95.0
+  ) {
+
+    Serial.println(
+      "EXCELLENT"
+    );
+
+  } else if (
+    finalPrecision >= 90.0
+  ) {
+
+    Serial.println(
+      "TRES BON"
+    );
+
+  } else if (
+    finalPrecision >= 80.0
+  ) {
+
+    Serial.println(
+      "BON"
+    );
+
+  } else if (
+    finalPrecision >= 65.0
+  ) {
+
+    Serial.println(
+      "MOYEN"
+    );
+
+  } else {
+
+    Serial.println(
+      "A REVOIR"
+    );
+  }
+
+  Serial.println(
+    "================================"
+  );
+
+  // ======================================
+  // FINAL SCREEN
+  // ======================================
+
+  tft.fillScreen(
+    TFT_BLACK
+  );
+
+  tft.setTextDatum(
+    TC_DATUM
+  );
+
+  tft.setTextColor(
+    TFT_CYAN,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(2);
+
+  tft.drawString(
+    "TOUCH 4 POINTS",
+    width / 2,
+    8
+  );
+
+  // ======================================
+  // FOUR RESULTS
+  // ======================================
+
+  tft.setTextSize(1);
+
+  for (
+    uint8_t i = 0;
+    i < 4;
+    i++
+  ) {
+
+    int16_t y =
+      48 + (i * 42);
+
+    // DEMANDE
+
+    tft.setTextColor(
+      TFT_YELLOW,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "P" +
+      String(i + 1) +
+      " D:" +
+      String(targetX[i]) +
+      "," +
+      String(targetY[i]),
+      5,
+      y
+    );
+
+    // REEL
+
+    tft.setTextColor(
+      TFT_WHITE,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "R:" +
+      String(measuredX[i]) +
+      "," +
+      String(measuredY[i]),
+      85,
+      y
+    );
+
+    // PRECISION
+
+    tft.setTextColor(
+      TFT_GREEN,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      String(
+        precision[i],
+        1
+      ) +
+      "%",
+      180,
+      y
+    );
+  }
+
+  // ======================================
+  // PRECISION MOYENNE
+  // ======================================
+
+  tft.setTextSize(2);
+
+  tft.setTextColor(
+    TFT_CYAN,
+    TFT_BLACK
+  );
+
+  tft.drawString(
+    "PRECISION",
+    width / 2,
+    225
+  );
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
+  tft.drawString(
+    String(
+      finalPrecision,
+      1
+    ) +
+    " %",
+    width / 2,
+    252
+  );
+
+  // ======================================
+  // FINAL RESULT
+  // ======================================
+
+  if (
+    finalPrecision >= 95.0
+  ) {
+
+    tft.setTextColor(
+      TFT_GREEN,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "EXCELLENT",
+      width / 2,
+      286
+    );
+
+  } else if (
+    finalPrecision >= 90.0
+  ) {
+
+    tft.setTextColor(
+      TFT_GREEN,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "TRES BON",
+      width / 2,
+      286
+    );
+
+  } else if (
+    finalPrecision >= 80.0
+  ) {
+
+    tft.setTextColor(
+      TFT_YELLOW,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "BON",
+      width / 2,
+      286
+    );
+
+  } else if (
+    finalPrecision >= 65.0
+  ) {
+
+    tft.setTextColor(
+      TFT_ORANGE,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "MOYEN",
+      width / 2,
+      286
+    );
+
+  } else {
+
+    tft.setTextColor(
+      TFT_RED,
+      TFT_BLACK
+    );
+
+    tft.drawString(
+      "A REVOIR",
+      width / 2,
+      286
+    );
+  }
+
+  tft.setTextDatum(
+    TL_DATUM
+  );
+
+  delay(2500);
+
+  tft.fillScreen(
+    TFT_BLACK
+  );
 
   return true;
-}
-
-// ========================================
-// TOUCH COORDINATE CONVERSION
-// ========================================
-
-void convertTouch(
-  TFT_eSPI &tft,
-  TouchCalibration &cal,
-  TS_Point &p,
-  int16_t &screenX,
-  int16_t &screenY
-) {
-
-  if (cal.rawRight != cal.rawLeft) {
-
-    screenX = map(
-      p.x,
-      cal.rawLeft,
-      cal.rawRight,
-      0,
-      tft.width() - 1
-    );
-
-  } else {
-
-    screenX = tft.width() / 2;
-  }
-
-  if (cal.rawBottom != cal.rawTop) {
-
-    screenY = map(
-      p.y,
-      cal.rawTop,
-      cal.rawBottom,
-      0,
-      tft.height() - 1
-    );
-
-  } else {
-
-    screenY = tft.height() / 2;
-  }
-
-  screenX = constrain(
-    screenX,
-    0,
-    tft.width() - 1
-  );
-
-  screenY = constrain(
-    screenY,
-    0,
-    tft.height() - 1
-  );
 }
 
 // ========================================
 // DRAW MODE BUTTON
 // ========================================
 
-const int16_t TOUCH_TEST_BUTTON_HEIGHT = 52;
+const int16_t TOUCH_TEST_BUTTON_HEIGHT =
+  52;
 
 bool isDrawButtonPressed(
   TFT_eSPI &tft,
@@ -436,12 +1263,14 @@ bool isDrawButtonPressed(
     x >= 20 &&
     x <= tft.width() - 20 &&
     y >= buttonY &&
-    y <= buttonY + TOUCH_TEST_BUTTON_HEIGHT
+    y <=
+      buttonY +
+      TOUCH_TEST_BUTTON_HEIGHT
   );
 }
 
 // ========================================
-// DRAW TOUCH TEST UI
+// TOUCH TEST UI
 // ========================================
 
 void drawTouchTestUI(
@@ -451,19 +1280,20 @@ void drawTouchTestUI(
   bool hasTouch
 ) {
 
-  int16_t width = tft.width();
-  int16_t height = tft.height();
+  int16_t width =
+    tft.width();
+
+  int16_t height =
+    tft.height();
 
   int16_t buttonY =
     height -
     TOUCH_TEST_BUTTON_HEIGHT -
     10;
 
-  // ======================================
-  // TITLE
-  // ======================================
-
-  tft.setTextDatum(TC_DATUM);
+  tft.setTextDatum(
+    TC_DATUM
+  );
 
   tft.setTextColor(
     TFT_CYAN,
@@ -477,10 +1307,6 @@ void drawTouchTestUI(
     width / 2,
     8
   );
-
-  // ======================================
-  // COORDINATES
-  // ======================================
 
   tft.fillRect(
     0,
@@ -498,13 +1324,15 @@ void drawTouchTestUI(
   if (hasTouch) {
 
     tft.drawString(
-      "X: " + String(screenX),
+      "X: " +
+      String(screenX),
       width / 2,
       42
     );
 
     tft.drawString(
-      "Y: " + String(screenY),
+      "Y: " +
+      String(screenY),
       width / 2,
       68
     );
@@ -523,10 +1351,6 @@ void drawTouchTestUI(
       68
     );
   }
-
-  // ======================================
-  // BUTTON
-  // ======================================
 
   tft.fillRoundRect(
     20,
@@ -559,7 +1383,9 @@ void drawTouchTestUI(
     buttonY + 26
   );
 
-  tft.setTextDatum(TL_DATUM);
+  tft.setTextDatum(
+    TL_DATUM
+  );
 }
 
 // ========================================
@@ -573,15 +1399,31 @@ bool testTouch(
 ) {
 
   Serial.println();
-  Serial.println("==============================");
-  Serial.println("TACTILE TEST");
-  Serial.println("==============================");
+  Serial.println(
+    "=============================="
+  );
 
-  Serial.println("Touchez l'ecran.");
-  Serial.println("Bouton DRAW MODE pour continuer.");
+  Serial.println(
+    "TACTILE TEST"
+  );
+
+  Serial.println(
+    "=============================="
+  );
+
+  Serial.println(
+    "Touchez l'ecran."
+  );
+
+  Serial.println(
+    "Bouton DRAW MODE pour continuer."
+  );
+
   Serial.println();
 
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(
+    TFT_BLACK
+  );
 
   drawTouchTestUI(
     tft,
@@ -595,9 +1437,12 @@ bool testTouch(
 
   while (true) {
 
-    if (touch.touched()) {
+    if (
+      touch.touched()
+    ) {
 
-      TS_Point p = touch.getPoint();
+      TS_Point p =
+        touch.getPoint();
 
       int16_t screenX;
       int16_t screenY;
@@ -605,29 +1450,13 @@ bool testTouch(
       convertTouch(
         tft,
         cal,
-        p,
+        p.x,
+        p.y,
         screenX,
         screenY
       );
 
-      Serial.print("RAW X=");
-      Serial.print(p.x);
-
-      Serial.print(" RAW Y=");
-      Serial.print(p.y);
-
-      Serial.print(" Z=");
-      Serial.print(p.z);
-
-      Serial.print(" -> SCREEN X=");
-      Serial.print(screenX);
-
-      Serial.print(" Y=");
-      Serial.println(screenY);
-
-      // ====================================
-      // DRAW BUTTON
-      // ====================================
+      // DRAW MODE
 
       if (
         isDrawButtonPressed(
@@ -638,25 +1467,71 @@ bool testTouch(
       ) {
 
         Serial.println();
-        Serial.println("DRAW MODE SELECTED");
-        Serial.println();
+        Serial.println(
+          "DRAW MODE SELECTED"
+        );
 
         delay(150);
 
-        while (touch.touched()) {
+        while (
+          touch.touched()
+        ) {
+
           delay(10);
         }
 
         delay(150);
 
-        tft.fillScreen(TFT_BLACK);
+        tft.fillScreen(
+          TFT_BLACK
+        );
 
         return true;
       }
 
-      // ====================================
-      // COORDINATES
-      // ====================================
+      // SERIAL
+
+      Serial.print(
+        "RAW X="
+      );
+
+      Serial.print(
+        p.x
+      );
+
+      Serial.print(
+        " RAW Y="
+      );
+
+      Serial.print(
+        p.y
+      );
+
+      Serial.print(
+        " Z="
+      );
+
+      Serial.print(
+        p.z
+      );
+
+      Serial.print(
+        " -> SCREEN X="
+      );
+
+      Serial.print(
+        screenX
+      );
+
+      Serial.print(
+        " Y="
+      );
+
+      Serial.println(
+        screenY
+      );
+
+      // UI
 
       drawTouchTestUI(
         tft,
@@ -665,9 +1540,7 @@ bool testTouch(
         true
       );
 
-      // ====================================
-      // TOUCH POINT
-      // ====================================
+      // POINT
 
       if (
         lastX >= 0 &&
@@ -692,8 +1565,11 @@ bool testTouch(
         );
       }
 
-      lastX = screenX;
-      lastY = screenY;
+      lastX =
+        screenX;
+
+      lastY =
+        screenY;
 
       delay(20);
 

@@ -5,42 +5,41 @@
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 
-#include "TFT_Config.h"
-#include "ScreenDiag.h"
-
 // ========================================
-// DRAW APP CONSTANTS
+// DRAWING CONFIGURATION
 // ========================================
 
 const int16_t DRAW_HEADER_HEIGHT = 42;
 const int16_t DRAW_FOOTER_HEIGHT = 48;
 
-const int16_t DRAW_BUTTON_CLEAR = 70;
-const int16_t DRAW_BUTTON_EXIT = 70;
+const int16_t DRAW_BUTTON_PEN  = 80;
+const int16_t DRAW_BUTTON_SAVE = 80;
+const int16_t DRAW_BUTTON_EXIT = 80;
 
 // ========================================
-// DRAW APP UI
+// DRAW AREA
 // ========================================
 
 void drawDrawingUI(
   TFT_eSPI &tft
 ) {
 
-  int16_t width = tft.width();
-  int16_t height = tft.height();
+  int16_t width =
+    tft.width();
 
-  int16_t drawTop =
-    DRAW_HEADER_HEIGHT;
+  int16_t height =
+    tft.height();
 
-  int16_t drawBottom =
-    height -
-    DRAW_FOOTER_HEIGHT;
+  int16_t footerY =
+    height - DRAW_FOOTER_HEIGHT;
 
   // ======================================
   // BACKGROUND
   // ======================================
 
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(
+    TFT_BLACK
+  );
 
   // ======================================
   // HEADER
@@ -54,15 +53,9 @@ void drawDrawingUI(
     TFT_DARKGREY
   );
 
-  tft.drawLine(
-    0,
-    DRAW_HEADER_HEIGHT - 1,
-    width,
-    DRAW_HEADER_HEIGHT - 1,
-    TFT_CYAN
+  tft.setTextDatum(
+    MC_DATUM
   );
-
-  tft.setTextDatum(TL_DATUM);
 
   tft.setTextColor(
     TFT_CYAN,
@@ -72,34 +65,9 @@ void drawDrawingUI(
   tft.setTextSize(2);
 
   tft.drawString(
-    "DRAW",
-    10,
-    12
-  );
-
-  // ======================================
-  // CLEAR BUTTON
-  // ======================================
-
-  tft.drawRect(
-    width - DRAW_BUTTON_CLEAR - 5,
-    5,
-    DRAW_BUTTON_CLEAR,
-    32,
-    TFT_YELLOW
-  );
-
-  tft.setTextDatum(MC_DATUM);
-
-  tft.setTextColor(
-    TFT_YELLOW,
-    TFT_DARKGREY
-  );
-
-  tft.drawString(
-    "CLEAR",
-    width - (DRAW_BUTTON_CLEAR / 2) - 5,
-    21
+    "DRAW APPLICATION",
+    width / 2,
+    DRAW_HEADER_HEIGHT / 2
   );
 
   // ======================================
@@ -108,10 +76,47 @@ void drawDrawingUI(
 
   tft.drawRect(
     0,
-    drawTop,
+    DRAW_HEADER_HEIGHT,
     width,
-    drawBottom - drawTop,
+    height -
+      DRAW_HEADER_HEIGHT -
+      DRAW_FOOTER_HEIGHT,
     TFT_DARKGREY
+  );
+
+  // ======================================
+  // CLEAR BUTTON
+  // ======================================
+
+  tft.fillRoundRect(
+    width - 58,
+    5,
+    52,
+    30,
+    5,
+    TFT_BLACK
+  );
+
+  tft.drawRoundRect(
+    width - 58,
+    5,
+    52,
+    30,
+    5,
+    TFT_RED
+  );
+
+  tft.setTextColor(
+    TFT_RED,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(1);
+
+  tft.drawString(
+    "CLEAR",
+    width - 32,
+    20
   );
 
   // ======================================
@@ -120,18 +125,32 @@ void drawDrawingUI(
 
   tft.fillRect(
     0,
-    height - DRAW_FOOTER_HEIGHT,
+    footerY,
     width,
     DRAW_FOOTER_HEIGHT,
     TFT_DARKGREY
   );
 
+  // ======================================
+  // SEPARATORS
+  // ======================================
+
   tft.drawLine(
-    0,
-    height - DRAW_FOOTER_HEIGHT,
-    width,
-    height - DRAW_FOOTER_HEIGHT,
-    TFT_CYAN
+    DRAW_BUTTON_PEN,
+    footerY,
+    DRAW_BUTTON_PEN,
+    height,
+    TFT_BLACK
+  );
+
+  tft.drawLine(
+    DRAW_BUTTON_PEN +
+      DRAW_BUTTON_SAVE,
+    footerY,
+    DRAW_BUTTON_PEN +
+      DRAW_BUTTON_SAVE,
+    height,
+    TFT_BLACK
   );
 
   // ======================================
@@ -143,10 +162,30 @@ void drawDrawingUI(
     TFT_DARKGREY
   );
 
+  tft.setTextSize(2);
+
   tft.drawString(
     "PEN",
-    45,
-    height - 24
+    DRAW_BUTTON_PEN / 2,
+    footerY + 24
+  );
+
+  // ======================================
+  // SAVE
+  // ======================================
+
+  tft.setTextColor(
+    TFT_YELLOW,
+    TFT_DARKGREY
+  );
+
+  tft.setTextSize(1);
+
+  tft.drawString(
+    "SAUVEGARDER",
+    DRAW_BUTTON_PEN +
+      DRAW_BUTTON_SAVE / 2,
+    footerY + 24
   );
 
   // ======================================
@@ -158,13 +197,49 @@ void drawDrawingUI(
     TFT_DARKGREY
   );
 
+  tft.setTextSize(2);
+
   tft.drawString(
     "EXIT",
-    width - 45,
-    height - 24
+    DRAW_BUTTON_PEN +
+      DRAW_BUTTON_SAVE +
+      DRAW_BUTTON_EXIT / 2,
+    footerY + 24
   );
 
-  tft.setTextDatum(TL_DATUM);
+  tft.setTextDatum(
+    TL_DATUM
+  );
+}
+
+// ========================================
+// DRAW PIXEL
+// ========================================
+
+void drawPixel(
+  TFT_eSPI &tft,
+  int16_t x,
+  int16_t y
+) {
+
+  if (
+    x < 0 ||
+    y < DRAW_HEADER_HEIGHT ||
+    x >= tft.width() ||
+    y >=
+      tft.height() -
+      DRAW_FOOTER_HEIGHT
+  ) {
+
+    return;
+  }
+
+  tft.fillCircle(
+    x,
+    y,
+    2,
+    TFT_CYAN
+  );
 }
 
 // ========================================
@@ -175,30 +250,30 @@ void clearDrawingArea(
   TFT_eSPI &tft
 ) {
 
-  int16_t width = tft.width();
-
-  int16_t top =
-    DRAW_HEADER_HEIGHT + 1;
+  int16_t width =
+    tft.width();
 
   int16_t height =
-    tft.height() -
-    DRAW_HEADER_HEIGHT -
-    DRAW_FOOTER_HEIGHT -
-    2;
+    tft.height();
 
   tft.fillRect(
     1,
-    top,
+    DRAW_HEADER_HEIGHT + 1,
     width - 2,
-    height,
+    height -
+      DRAW_HEADER_HEIGHT -
+      DRAW_FOOTER_HEIGHT -
+      2,
     TFT_BLACK
   );
+
+  // Restore border
 
   tft.drawRect(
     0,
     DRAW_HEADER_HEIGHT,
     width,
-    tft.height() -
+    height -
       DRAW_HEADER_HEIGHT -
       DRAW_FOOTER_HEIGHT,
     TFT_DARKGREY
@@ -206,20 +281,79 @@ void clearDrawingArea(
 }
 
 // ========================================
-// DRAW AREA TEST
+// PEN BUTTON
 // ========================================
 
-bool isDrawingArea(
+bool isPenButton(
   TFT_eSPI &tft,
   int16_t x,
   int16_t y
 ) {
 
+  int16_t footerY =
+    tft.height() -
+    DRAW_FOOTER_HEIGHT;
+
   return (
-    x >= 1 &&
-    x < tft.width() - 1 &&
-    y > DRAW_HEADER_HEIGHT &&
-    y < tft.height() - DRAW_FOOTER_HEIGHT
+    x >= 0 &&
+    x < DRAW_BUTTON_PEN &&
+    y >= footerY &&
+    y < tft.height()
+  );
+}
+
+// ========================================
+// SAVE BUTTON
+// ========================================
+
+bool isSaveButton(
+  TFT_eSPI &tft,
+  int16_t x,
+  int16_t y
+) {
+
+  int16_t footerY =
+    tft.height() -
+    DRAW_FOOTER_HEIGHT;
+
+  int16_t x1 =
+    DRAW_BUTTON_PEN;
+
+  int16_t x2 =
+    DRAW_BUTTON_PEN +
+    DRAW_BUTTON_SAVE;
+
+  return (
+    x >= x1 &&
+    x < x2 &&
+    y >= footerY &&
+    y < tft.height()
+  );
+}
+
+// ========================================
+// EXIT BUTTON
+// ========================================
+
+bool isExitButton(
+  TFT_eSPI &tft,
+  int16_t x,
+  int16_t y
+) {
+
+  int16_t footerY =
+    tft.height() -
+    DRAW_FOOTER_HEIGHT;
+
+  int16_t x1 =
+    DRAW_BUTTON_PEN +
+    DRAW_BUTTON_SAVE;
+
+  return (
+    x >= x1 &&
+    x < tft.width() &&
+    y >= footerY &&
+    y < tft.height()
   );
 }
 
@@ -234,33 +368,135 @@ bool isClearButton(
 ) {
 
   return (
-    x >= tft.width() - DRAW_BUTTON_CLEAR - 5 &&
-    x < tft.width() - 5 &&
-    y >= 5 &&
-    y < 37
+    x >= tft.width() - 60 &&
+    x < tft.width() &&
+    y >= 0 &&
+    y < DRAW_HEADER_HEIGHT
   );
 }
 
 // ========================================
-// EXIT BUTTON
+// SAVE FEEDBACK
 // ========================================
 
-bool isExitButton(
-  TFT_eSPI &tft,
-  int16_t x,
-  int16_t y
+void showSaveFeedback(
+  TFT_eSPI &tft
 ) {
 
-  return (
-    x >= tft.width() - 90 &&
-    x <= tft.width() &&
-    y >= tft.height() - DRAW_FOOTER_HEIGHT &&
-    y <= tft.height()
+  int16_t width =
+    tft.width();
+
+  int16_t height =
+    tft.height();
+
+  int16_t boxWidth = 180;
+  int16_t boxHeight = 70;
+
+  int16_t boxX =
+    (width - boxWidth) / 2;
+
+  int16_t boxY =
+    (height - boxHeight) / 2;
+
+  tft.fillRoundRect(
+    boxX,
+    boxY,
+    boxWidth,
+    boxHeight,
+    8,
+    TFT_BLACK
   );
+
+  tft.drawRoundRect(
+    boxX,
+    boxY,
+    boxWidth,
+    boxHeight,
+    8,
+    TFT_YELLOW
+  );
+
+  tft.setTextDatum(
+    MC_DATUM
+  );
+
+  tft.setTextColor(
+    TFT_YELLOW,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(2);
+
+  tft.drawString(
+    "SAUVEGARDE",
+    width / 2,
+    height / 2 - 10
+  );
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(1);
+
+  tft.drawString(
+    "DESSIN EN MEMOIRE",
+    width / 2,
+    height / 2 + 15
+  );
+
+  tft.setTextDatum(
+    TL_DATUM
+  );
+
+  delay(800);
 }
 
 // ========================================
-// DRAW APP
+// EXIT FEEDBACK
+// ========================================
+
+void showExitFeedback(
+  TFT_eSPI &tft
+) {
+
+  int16_t width =
+    tft.width();
+
+  int16_t height =
+    tft.height();
+
+  tft.fillScreen(
+    TFT_BLACK
+  );
+
+  tft.setTextDatum(
+    MC_DATUM
+  );
+
+  tft.setTextColor(
+    TFT_RED,
+    TFT_BLACK
+  );
+
+  tft.setTextSize(2);
+
+  tft.drawString(
+    "EXIT",
+    width / 2,
+    height / 2
+  );
+
+  tft.setTextDatum(
+    TL_DATUM
+  );
+
+  delay(700);
+}
+
+// ========================================
+// DRAW APPLICATION
 // ========================================
 
 void testDrawing(
@@ -270,63 +506,128 @@ void testDrawing(
 ) {
 
   Serial.println();
-  Serial.println("==============================");
-  Serial.println("DRAW APPLICATION");
-  Serial.println("==============================");
+  Serial.println(
+    "================================"
+  );
 
-  Serial.println("Zone de dessin active.");
-  Serial.println("CLEAR pour effacer.");
-  Serial.println("EXIT pour revenir au TOUCH TEST.");
+  Serial.println(
+    "DRAW APPLICATION"
+  );
+
+  Serial.println(
+    "================================"
+  );
+
+  Serial.println(
+    "PEN         : dessin"
+  );
+
+  Serial.println(
+    "SAUVEGARDER : sauvegarde"
+  );
+
+  Serial.println(
+    "EXIT        : quitter"
+  );
+
+  Serial.println(
+    "CLEAR       : effacer"
+  );
+
   Serial.println();
 
-  drawDrawingUI(tft);
+  drawDrawingUI(
+    tft
+  );
 
   int16_t lastX = -1;
   int16_t lastY = -1;
 
+  bool drawing =
+    false;
+
   while (true) {
 
-    if (touch.touched()) {
+    if (
+      touch.touched()
+    ) {
 
-      TS_Point p = touch.getPoint();
+      // ==================================
+      // READ TOUCH
+      // ==================================
+
+      TS_Point p =
+        touch.getPoint();
 
       int16_t screenX;
       int16_t screenY;
 
+      // ==================================
+      // CORRECTION
+      //
+      // convertTouch() attend:
+      // rawX, rawY
+      //
+      // On lui transmet donc:
+      // p.x, p.y
+      // ==================================
+
       convertTouch(
         tft,
         cal,
-        p,
+        p.x,
+        p.y,
         screenX,
         screenY
       );
 
-      // ====================================
-      // EXIT
-      // ====================================
+      // ==================================
+      // SERIAL DEBUG
+      // ==================================
 
-      if (
-        isExitButton(
-          tft,
-          screenX,
-          screenY
-        )
-      ) {
+      Serial.print(
+        "RAW X="
+      );
 
-        Serial.println("EXIT DRAW");
+      Serial.print(
+        p.x
+      );
 
-        while (touch.touched()) {
-          delay(10);
-        }
+      Serial.print(
+        " RAW Y="
+      );
 
-        delay(150);
+      Serial.print(
+        p.y
+      );
 
-        return;
-      }
+      Serial.print(
+        " Z="
+      );
 
-      // ====================================
+      Serial.print(
+        p.z
+      );
+
+      Serial.print(
+        " -> SCREEN X="
+      );
+
+      Serial.print(
+        screenX
+      );
+
+      Serial.print(
+        " Y="
+      );
+
+      Serial.println(
+        screenY
+      );
+
+      // ==================================
       // CLEAR
-      // ====================================
+      // ==================================
 
       if (
         isClearButton(
@@ -336,32 +637,144 @@ void testDrawing(
         )
       ) {
 
-        Serial.println("CLEAR DRAW");
+        Serial.println(
+          "CLEAR DRAWING"
+        );
 
-        clearDrawingArea(tft);
+        clearDrawingArea(
+          tft
+        );
 
-        lastX = -1;
-        lastY = -1;
+        drawing =
+          false;
 
-        while (touch.touched()) {
+        lastX =
+          -1;
+
+        lastY =
+          -1;
+
+        delay(150);
+
+        while (
+          touch.touched()
+        ) {
+
           delay(10);
         }
 
-        delay(100);
+        delay(150);
 
         continue;
       }
 
-      // ====================================
-      // DRAW
-      // ====================================
+      // ==================================
+      // FOOTER
+      // ==================================
 
       if (
-        isDrawingArea(
-          tft,
-          screenX,
-          screenY
-        )
+        screenY >=
+        tft.height() -
+        DRAW_FOOTER_HEIGHT
+      ) {
+
+        // ==================================
+        // PEN
+        // ==================================
+
+        if (
+          isPenButton(
+            tft,
+            screenX,
+            screenY
+          )
+        ) {
+
+          Serial.println(
+            "PEN MODE"
+          );
+
+          drawing =
+            true;
+
+          lastX =
+            -1;
+
+          lastY =
+            -1;
+
+        }
+
+        // ==================================
+        // SAVE
+        // ==================================
+
+        else if (
+          isSaveButton(
+            tft,
+            screenX,
+            screenY
+          )
+        ) {
+
+          Serial.println(
+            "SAVE DRAW"
+          );
+
+          showSaveFeedback(
+            tft
+          );
+
+          lastX =
+            -1;
+
+          lastY =
+            -1;
+        }
+
+        // ==================================
+        // EXIT
+        // ==================================
+
+        else if (
+          isExitButton(
+            tft,
+            screenX,
+            screenY
+          )
+        ) {
+
+          Serial.println(
+            "EXIT DRAW APPLICATION"
+          );
+
+          showExitFeedback(
+            tft
+          );
+
+          return;
+        }
+
+        delay(150);
+
+        while (
+          touch.touched()
+        ) {
+
+          delay(10);
+        }
+
+        delay(150);
+
+        continue;
+      }
+
+      // ==================================
+      // DRAWING
+      // ==================================
+
+      if (
+        drawing
       ) {
 
         if (
@@ -374,7 +787,7 @@ void testDrawing(
             lastY,
             screenX,
             screenY,
-            TFT_GREEN
+            TFT_CYAN
           );
 
         } else {
@@ -383,28 +796,29 @@ void testDrawing(
             screenX,
             screenY,
             2,
-            TFT_GREEN
+            TFT_CYAN
           );
         }
 
-        lastX = screenX;
-        lastY = screenY;
+        lastX =
+          screenX;
 
-      } else {
-
-        lastX = -1;
-        lastY = -1;
+        lastY =
+          screenY;
       }
 
-      delay(8);
+      delay(10);
 
     } else {
 
-      lastX = -1;
-      lastY = -1;
-    }
+      lastX =
+        -1;
 
-    delay(2);
+      lastY =
+        -1;
+
+      delay(5);
+    }
   }
 }
 

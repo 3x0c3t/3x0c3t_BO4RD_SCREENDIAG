@@ -16,7 +16,7 @@ void drawSplashScreen(TFT_eSPI &tft) {
   tft.setTextSize(3);
 
   tft.drawString(
-    "-3xØc3t-",
+    "-3x0c3t-",
     width / 2,
     height / 2 - 35
   );

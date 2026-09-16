@@ -51,18 +51,28 @@ void setup() {
   // TFT INITIALIZATION
   // ======================================
 
+  Serial.println();
+  Serial.println("Initializing TFT...");
+
   tft.init();
+
+  Serial.println("TFT initialized");
 
   tft.setRotation(
     TFT_ROTATION
   );
 
+  Serial.println("TFT rotation OK");
+
   tft.fillScreen(
     TFT_BLACK
   );
 
-  Serial.println();
-  Serial.println("TFT initialized");
+  Serial.println("TFT screen cleared");
+
+  // ======================================
+  // SCREEN INFORMATION
+  // ======================================
 
   printScreenInfo(
     tft
@@ -89,10 +99,6 @@ void setup() {
     );
   }
 
-  touch.setRotation(
-    TFT_ROTATION
-  );
-
   Serial.print("Touch CS GPIO : ");
   Serial.println(
     SCREEN_DIAG_TOUCH_CS
@@ -109,16 +115,44 @@ void setup() {
   );
 
   // ======================================
+  // TOUCH ROTATION
+  // ======================================
+
+  Serial.println(
+    "Setting touch rotation..."
+  );
+
+  touch.setRotation(
+    TFT_ROTATION
+  );
+
+  Serial.println(
+    "Touch rotation OK"
+  );
+
+  // ======================================
   // SPLASH SCREEN
   // ======================================
+
+  Serial.println(
+    "Starting splash screen..."
+  );
 
   drawSplashScreen(
     tft
   );
 
+  Serial.println(
+    "Splash screen OK"
+  );
+
   // ======================================
   // SCREEN DIAGNOSTICS
   // ======================================
+
+  Serial.println(
+    "Starting screen diagnostics..."
+  );
 
   testScreen(
     tft
@@ -132,9 +166,18 @@ void setup() {
     tft
   );
 
+  Serial.println(
+    "Screen diagnostics OK"
+  );
+
   // ======================================
   // TOUCH CALIBRATION
   // ======================================
+
+  Serial.println();
+  Serial.println(
+    "Starting TOUCH 4 POINTS..."
+  );
 
   bool calibrationOK =
     calibrateTouch(
