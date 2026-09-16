@@ -5,37 +5,38 @@
 
 void drawSplashScreen(TFT_eSPI &tft) {
 
-  int16_t width  = tft.width();
+  int16_t width = tft.width();
   int16_t height = tft.height();
 
   tft.fillScreen(TFT_BLACK);
 
   tft.setTextDatum(MC_DATUM);
 
-  // ----------------------------------------------------------
-  // Logo
-  // ----------------------------------------------------------
-
   tft.setTextColor(TFT_CYAN, TFT_BLACK);
   tft.setTextSize(3);
 
-  tft.drawString("-3xØc3t-", width / 2, height / 2 - 35);
-
-  // ----------------------------------------------------------
-  // Project
-  // ----------------------------------------------------------
+  tft.drawString(
+    "-3xØc3t-",
+    width / 2,
+    height / 2 - 35
+  );
 
   tft.setTextColor(TFT_GREEN, TFT_BLACK);
   tft.setTextSize(2);
 
-  tft.drawString("BO4RD", width / 2, height / 2 + 5);
-  tft.drawString("SCREEN DIAG", width / 2, height / 2 + 30);
+  tft.drawString(
+    "BO4RD",
+    width / 2,
+    height / 2 + 5
+  );
 
-  // ----------------------------------------------------------
-  // Progress bar
-  // ----------------------------------------------------------
+  tft.drawString(
+    "SCREEN DIAG",
+    width / 2,
+    height / 2 + 30
+  );
 
-  int16_t barWidth  = width - 60;
+  int16_t barWidth = width - 60;
   int16_t barHeight = 8;
   int16_t barX = 30;
   int16_t barY = height - 35;
