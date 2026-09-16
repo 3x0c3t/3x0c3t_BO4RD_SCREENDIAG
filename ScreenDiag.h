@@ -77,45 +77,11 @@ void testColorBars(TFT_eSPI &tft) {
 
   int16_t barHeight = height / 6;
 
-  tft.fillRect(
-    0,
-    0,
-    width,
-    barHeight,
-    TFT_RED
-  );
-
-  tft.fillRect(
-    0,
-    barHeight,
-    width,
-    barHeight,
-    TFT_GREEN
-  );
-
-  tft.fillRect(
-    0,
-    barHeight * 2,
-    width,
-    barHeight,
-    TFT_BLUE
-  );
-
-  tft.fillRect(
-    0,
-    barHeight * 3,
-    width,
-    barHeight,
-    TFT_CYAN
-  );
-
-  tft.fillRect(
-    0,
-    barHeight * 4,
-    width,
-    barHeight,
-    TFT_MAGENTA
-  );
+  tft.fillRect(0, 0, width, barHeight, TFT_RED);
+  tft.fillRect(0, barHeight, width, barHeight, TFT_GREEN);
+  tft.fillRect(0, barHeight * 2, width, barHeight, TFT_BLUE);
+  tft.fillRect(0, barHeight * 3, width, barHeight, TFT_CYAN);
+  tft.fillRect(0, barHeight * 4, width, barHeight, TFT_MAGENTA);
 
   tft.fillRect(
     0,
@@ -175,12 +141,7 @@ void testGeometry(TFT_eSPI &tft) {
   );
 
   tft.setTextDatum(MC_DATUM);
-
-  tft.setTextColor(
-    TFT_WHITE,
-    TFT_BLACK
-  );
-
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.setTextSize(2);
 
   tft.drawString(
@@ -400,25 +361,103 @@ bool calibrateTouch(
 }
 
 // ========================================
-// TOUCH TEST
+// TOUCH COORDINATE CONVERSION
 // ========================================
 
-void testTouch(
+void convertTouch(
   TFT_eSPI &tft,
-  XPT2046_Touchscreen &touch,
-  TouchCalibration &cal
+  TouchCalibration &cal,
+  TS_Point &p,
+  int16_t &screenX,
+  int16_t &screenY
 ) {
 
-  Serial.println();
-  Serial.println("==============================");
-  Serial.println("TACTILE TEST");
-  Serial.println("==============================");
+  if (cal.rawRight != cal.rawLeft) {
 
-  Serial.println("Touchez l'ecran.");
-  Serial.println("Ctrl+C / reset pour terminer.");
-  Serial.println();
+    screenX = map(
+      p.x,
+      cal.rawLeft,
+      cal.rawRight,
+      0,
+      tft.width() - 1
+    );
 
-  tft.fillScreen(TFT_BLACK);
+  } else {
+
+    screenX = tft.width() / 2;
+  }
+
+  if (cal.rawBottom != cal.rawTop) {
+
+    screenY = map(
+      p.y,
+      cal.rawTop,
+      cal.rawBottom,
+      0,
+      tft.height() - 1
+    );
+
+  } else {
+
+    screenY = tft.height() / 2;
+  }
+
+  screenX = constrain(
+    screenX,
+    0,
+    tft.width() - 1
+  );
+
+  screenY = constrain(
+    screenY,
+    0,
+    tft.height() - 1
+  );
+}
+
+// ========================================
+// DRAW MODE BUTTON
+// ========================================
+
+const int16_t TOUCH_TEST_BUTTON_HEIGHT = 52;
+
+bool isDrawButtonPressed(
+  TFT_eSPI &tft,
+  int16_t x,
+  int16_t y
+) {
+
+  int16_t buttonY =
+    tft.height() -
+    TOUCH_TEST_BUTTON_HEIGHT -
+    10;
+
+  return (
+    x >= 20 &&
+    x <= tft.width() - 20 &&
+    y >= buttonY &&
+    y <= buttonY + TOUCH_TEST_BUTTON_HEIGHT
+  );
+}
+
+// ========================================
+// DRAW TOUCH TEST UI
+// ========================================
+
+void drawTouchTestUI(
+  TFT_eSPI &tft,
+  int16_t screenX,
+  int16_t screenY,
+  bool hasTouch
+) {
+
+  int16_t width = tft.width();
+  int16_t height = tft.height();
+
+  int16_t buttonY =
+    height -
+    TOUCH_TEST_BUTTON_HEIGHT -
+    10;
 
   // ======================================
   // TITLE
@@ -435,36 +474,124 @@ void testTouch(
 
   tft.drawString(
     "TOUCH TEST",
-    tft.width() / 2,
+    width / 2,
     8
   );
 
   // ======================================
-  // INITIAL COORDINATES
+  // COORDINATES
   // ======================================
+
+  tft.fillRect(
+    0,
+    38,
+    width,
+    55,
+    TFT_BLACK
+  );
 
   tft.setTextColor(
     TFT_WHITE,
     TFT_BLACK
   );
 
-  tft.drawString(
-    "X: ---",
-    tft.width() / 2,
-    42
+  if (hasTouch) {
+
+    tft.drawString(
+      "X: " + String(screenX),
+      width / 2,
+      42
+    );
+
+    tft.drawString(
+      "Y: " + String(screenY),
+      width / 2,
+      68
+    );
+
+  } else {
+
+    tft.drawString(
+      "X: ---",
+      width / 2,
+      42
+    );
+
+    tft.drawString(
+      "Y: ---",
+      width / 2,
+      68
+    );
+  }
+
+  // ======================================
+  // BUTTON
+  // ======================================
+
+  tft.fillRoundRect(
+    20,
+    buttonY,
+    width - 40,
+    TOUCH_TEST_BUTTON_HEIGHT,
+    8,
+    TFT_DARKGREY
   );
 
+  tft.drawRoundRect(
+    20,
+    buttonY,
+    width - 40,
+    TOUCH_TEST_BUTTON_HEIGHT,
+    8,
+    TFT_CYAN
+  );
+
+  tft.setTextColor(
+    TFT_CYAN,
+    TFT_DARKGREY
+  );
+
+  tft.setTextSize(2);
+
   tft.drawString(
-    "Y: ---",
-    tft.width() / 2,
-    68
+    "DRAW MODE",
+    width / 2,
+    buttonY + 26
   );
 
   tft.setTextDatum(TL_DATUM);
+}
 
-  // ======================================
-  // TOUCH LOOP
-  // ======================================
+// ========================================
+// TOUCH TEST
+// ========================================
+
+bool testTouch(
+  TFT_eSPI &tft,
+  XPT2046_Touchscreen &touch,
+  TouchCalibration &cal
+) {
+
+  Serial.println();
+  Serial.println("==============================");
+  Serial.println("TACTILE TEST");
+  Serial.println("==============================");
+
+  Serial.println("Touchez l'ecran.");
+  Serial.println("Bouton DRAW MODE pour continuer.");
+  Serial.println();
+
+  tft.fillScreen(TFT_BLACK);
+
+  drawTouchTestUI(
+    tft,
+    0,
+    0,
+    false
+  );
+
+  int16_t lastX = -1;
+  int16_t lastY = -1;
 
   while (true) {
 
@@ -472,68 +599,16 @@ void testTouch(
 
       TS_Point p = touch.getPoint();
 
-      int32_t screenX;
-      int32_t screenY;
+      int16_t screenX;
+      int16_t screenY;
 
-      // ====================================
-      // CONVERT X
-      // ====================================
-
-      if (cal.rawRight != cal.rawLeft) {
-
-        screenX = map(
-          p.x,
-          cal.rawLeft,
-          cal.rawRight,
-          0,
-          tft.width() - 1
-        );
-
-      } else {
-
-        screenX =
-          tft.width() / 2;
-      }
-
-      // ====================================
-      // CONVERT Y
-      // ====================================
-
-      if (cal.rawBottom != cal.rawTop) {
-
-        screenY = map(
-          p.y,
-          cal.rawTop,
-          cal.rawBottom,
-          0,
-          tft.height() - 1
-        );
-
-      } else {
-
-        screenY =
-          tft.height() / 2;
-      }
-
-      // ====================================
-      // LIMIT
-      // ====================================
-
-      screenX = constrain(
+      convertTouch(
+        tft,
+        cal,
+        p,
         screenX,
-        0,
-        tft.width() - 1
+        screenY
       );
-
-      screenY = constrain(
-        screenY,
-        0,
-        tft.height() - 1
-      );
-
-      // ====================================
-      // SERIAL
-      // ====================================
 
       Serial.print("RAW X=");
       Serial.print(p.x);
@@ -551,66 +626,87 @@ void testTouch(
       Serial.println(screenY);
 
       // ====================================
-      // DISPLAY X
+      // DRAW BUTTON
       // ====================================
 
-      tft.setTextDatum(TC_DATUM);
+      if (
+        isDrawButtonPressed(
+          tft,
+          screenX,
+          screenY
+        )
+      ) {
 
-      tft.fillRect(
-        0,
-        38,
-        tft.width(),
-        25,
-        TFT_BLACK
-      );
+        Serial.println();
+        Serial.println("DRAW MODE SELECTED");
+        Serial.println();
 
-      tft.setTextColor(
-        TFT_WHITE,
-        TFT_BLACK
-      );
+        delay(150);
 
-      tft.drawString(
-        "X: " + String(screenX),
-        tft.width() / 2,
-        42
-      );
+        while (touch.touched()) {
+          delay(10);
+        }
+
+        delay(150);
+
+        tft.fillScreen(TFT_BLACK);
+
+        return true;
+      }
 
       // ====================================
-      // DISPLAY Y
+      // COORDINATES
       // ====================================
 
-      tft.fillRect(
-        0,
-        64,
-        tft.width(),
-        25,
-        TFT_BLACK
+      drawTouchTestUI(
+        tft,
+        screenX,
+        screenY,
+        true
       );
-
-      tft.drawString(
-        "Y: " + String(screenY),
-        tft.width() / 2,
-        68
-      );
-
-      tft.setTextDatum(TL_DATUM);
 
       // ====================================
       // TOUCH POINT
       // ====================================
 
-      tft.fillCircle(
-        screenX,
-        screenY,
-        5,
-        TFT_RED
-      );
+      if (
+        lastX >= 0 &&
+        lastY >= 0
+      ) {
 
-      delay(100);
+        tft.drawLine(
+          lastX,
+          lastY,
+          screenX,
+          screenY,
+          TFT_RED
+        );
+
+      } else {
+
+        tft.fillCircle(
+          screenX,
+          screenY,
+          5,
+          TFT_RED
+        );
+      }
+
+      lastX = screenX;
+      lastY = screenY;
+
+      delay(20);
+
+    } else {
+
+      lastX = -1;
+      lastY = -1;
     }
 
-    delay(10);
+    delay(5);
   }
+
+  return false;
 }
 
 #endif
