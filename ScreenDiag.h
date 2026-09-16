@@ -175,7 +175,12 @@ void testGeometry(TFT_eSPI &tft) {
   );
 
   tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
   tft.setTextSize(2);
 
   tft.drawString(
@@ -361,28 +366,16 @@ bool calibrateTouch(
   }
 
   cal.rawLeft =
-    (
-      (int32_t)rawX[0] +
-      rawX[3]
-    ) / 2;
+    ((int32_t)rawX[0] + rawX[3]) / 2;
 
   cal.rawRight =
-    (
-      (int32_t)rawX[1] +
-      rawX[2]
-    ) / 2;
+    ((int32_t)rawX[1] + rawX[2]) / 2;
 
   cal.rawTop =
-    (
-      (int32_t)rawY[0] +
-      rawY[1]
-    ) / 2;
+    ((int32_t)rawY[0] + rawY[1]) / 2;
 
   cal.rawBottom =
-    (
-      (int32_t)rawY[2] +
-      rawY[3]
-    ) / 2;
+    ((int32_t)rawY[2] + rawY[3]) / 2;
 
   Serial.println();
   Serial.println("CALIBRATION RAW VALUES");
@@ -427,8 +420,17 @@ void testTouch(
 
   tft.fillScreen(TFT_BLACK);
 
+  // ======================================
+  // TITLE
+  // ======================================
+
   tft.setTextDatum(TC_DATUM);
-  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+
+  tft.setTextColor(
+    TFT_CYAN,
+    TFT_BLACK
+  );
+
   tft.setTextSize(2);
 
   tft.drawString(
@@ -437,7 +439,32 @@ void testTouch(
     8
   );
 
+  // ======================================
+  // INITIAL COORDINATES
+  // ======================================
+
+  tft.setTextColor(
+    TFT_WHITE,
+    TFT_BLACK
+  );
+
+  tft.drawString(
+    "X: ---",
+    tft.width() / 2,
+    42
+  );
+
+  tft.drawString(
+    "Y: ---",
+    tft.width() / 2,
+    68
+  );
+
   tft.setTextDatum(TL_DATUM);
+
+  // ======================================
+  // TOUCH LOOP
+  // ======================================
 
   while (true) {
 
@@ -448,37 +475,49 @@ void testTouch(
       int32_t screenX;
       int32_t screenY;
 
+      // ====================================
+      // CONVERT X
+      // ====================================
+
       if (cal.rawRight != cal.rawLeft) {
 
-        screenX =
-          map(
-            p.x,
-            cal.rawLeft,
-            cal.rawRight,
-            0,
-            tft.width() - 1
-          );
+        screenX = map(
+          p.x,
+          cal.rawLeft,
+          cal.rawRight,
+          0,
+          tft.width() - 1
+        );
 
       } else {
 
-        screenX = tft.width() / 2;
+        screenX =
+          tft.width() / 2;
       }
+
+      // ====================================
+      // CONVERT Y
+      // ====================================
 
       if (cal.rawBottom != cal.rawTop) {
 
-        screenY =
-          map(
-            p.y,
-            cal.rawTop,
-            cal.rawBottom,
-            0,
-            tft.height() - 1
-          );
+        screenY = map(
+          p.y,
+          cal.rawTop,
+          cal.rawBottom,
+          0,
+          tft.height() - 1
+        );
 
       } else {
 
-        screenY = tft.height() / 2;
+        screenY =
+          tft.height() / 2;
       }
+
+      // ====================================
+      // LIMIT
+      // ====================================
 
       screenX = constrain(
         screenX,
@@ -491,6 +530,10 @@ void testTouch(
         0,
         tft.height() - 1
       );
+
+      // ====================================
+      // SERIAL
+      // ====================================
 
       Serial.print("RAW X=");
       Serial.print(p.x);
@@ -506,6 +549,55 @@ void testTouch(
 
       Serial.print(" Y=");
       Serial.println(screenY);
+
+      // ====================================
+      // DISPLAY X
+      // ====================================
+
+      tft.setTextDatum(TC_DATUM);
+
+      tft.fillRect(
+        0,
+        38,
+        tft.width(),
+        25,
+        TFT_BLACK
+      );
+
+      tft.setTextColor(
+        TFT_WHITE,
+        TFT_BLACK
+      );
+
+      tft.drawString(
+        "X: " + String(screenX),
+        tft.width() / 2,
+        42
+      );
+
+      // ====================================
+      // DISPLAY Y
+      // ====================================
+
+      tft.fillRect(
+        0,
+        64,
+        tft.width(),
+        25,
+        TFT_BLACK
+      );
+
+      tft.drawString(
+        "Y: " + String(screenY),
+        tft.width() / 2,
+        68
+      );
+
+      tft.setTextDatum(TL_DATUM);
+
+      // ====================================
+      // TOUCH POINT
+      // ====================================
 
       tft.fillCircle(
         screenX,
