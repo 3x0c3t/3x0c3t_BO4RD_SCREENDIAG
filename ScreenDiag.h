@@ -342,6 +342,41 @@ void drawCalibrationTarget(
 }
 
 // ========================================
+// VALIDATION RAW XPT2046
+// ========================================
+
+bool isValidRawTouch(
+  const TS_Point &p
+) {
+
+  // XPT2046 nominal raw range
+  if (
+    p.x < 200 ||
+    p.x > 3900
+  ) {
+    return false;
+  }
+
+  // XPT2046 nominal raw range
+  if (
+    p.y < 200 ||
+    p.y > 3900
+  ) {
+    return false;
+  }
+
+  // Reject invalid / floating pressure
+  if (
+    p.z <= 0 ||
+    p.z > 2000
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+// ========================================
 // WAIT FOR TOUCH
 // ========================================
 
@@ -359,10 +394,61 @@ bool waitForTouch(
     millis() - startTime < 15000
   ) {
 
-    if (touch.touched()) {
+    if (
+      touch.touched()
+    ) {
 
       TS_Point p =
         touch.getPoint();
+
+      // ==================================
+      // ALWAYS DISPLAY RAW VALUE
+      // ==================================
+
+      Serial.print(
+        "RAW X="
+      );
+
+      Serial.print(
+        p.x
+      );
+
+      Serial.print(
+        " RAW Y="
+      );
+
+      Serial.print(
+        p.y
+      );
+
+      Serial.print(
+        " Z="
+      );
+
+      Serial.println(
+        p.z
+      );
+
+      // ==================================
+      // REJECT INVALID TOUCH
+      // ==================================
+
+      if (
+        !isValidRawTouch(p)
+      ) {
+
+        Serial.println(
+          "INVALID RAW TOUCH"
+        );
+
+        delay(20);
+
+        continue;
+      }
+
+      // ==================================
+      // VALID TOUCH ONLY
+      // ==================================
 
       rawX =
         p.x;
@@ -373,28 +459,8 @@ bool waitForTouch(
       pressure =
         p.z;
 
-      Serial.print(
-        "RAW X="
-      );
-
-      Serial.print(
-        rawX
-      );
-
-      Serial.print(
-        " RAW Y="
-      );
-
-      Serial.print(
-        rawY
-      );
-
-      Serial.print(
-        " Z="
-      );
-
       Serial.println(
-        pressure
+        "VALID RAW TOUCH"
       );
 
       delay(300);
@@ -503,39 +569,23 @@ bool calibrateTouch(
 
   const int16_t margin = 25;
 
-  // ======================================
-  // TARGETS
-  // ======================================
-
   int16_t targetX[4] = {
-
     margin,
     width - margin,
     width - margin,
     margin
-
   };
 
   int16_t targetY[4] = {
-
     margin,
     margin,
     height - margin,
     height - margin
-
   };
-
-  // ======================================
-  // RAW VALUES
-  // ======================================
 
   int16_t rawX[4];
   int16_t rawY[4];
   int16_t rawZ[4];
-
-  // ======================================
-  // SERIAL HEADER
-  // ======================================
 
   Serial.println();
   Serial.println(
@@ -567,10 +617,6 @@ bool calibrateTouch(
   );
 
   Serial.println();
-
-  // ======================================
-  // FOUR POINTS
-  // ======================================
 
   for (
     uint8_t i = 0;
@@ -691,7 +737,7 @@ bool calibrateTouch(
   }
 
   // ======================================
-  // BUILD CALIBRATION
+  // RAW CALIBRATION VALUES
   // ======================================
 
   cal.rawLeft =
@@ -717,10 +763,6 @@ bool calibrateTouch(
       (int32_t)rawY[2] +
       rawY[3]
     ) / 2;
-
-  // ======================================
-  // RAW CALIBRATION VALUES
-  // ======================================
 
   Serial.println();
   Serial.println(
@@ -768,13 +810,11 @@ bool calibrateTouch(
   );
 
   // ======================================
-  // FINAL PRECISION CALCULATION
+  // PRECISION
   // ======================================
 
   float precision[4];
-
-  float totalPrecision =
-    0.0;
+  float totalPrecision = 0.0;
 
   float maxDistance =
     sqrt(
@@ -793,10 +833,6 @@ bool calibrateTouch(
   int16_t measuredY[4];
 
   float distance[4];
-
-  // ======================================
-  // CALCULATE EACH POINT
-  // ======================================
 
   for (
     uint8_t i = 0;
@@ -850,7 +886,7 @@ bool calibrateTouch(
     totalPrecision / 4.0;
 
   // ======================================
-  // SERIAL FINAL REPORT
+  // SERIAL REPORT
   // ======================================
 
   Serial.println();
@@ -957,10 +993,6 @@ bool calibrateTouch(
     );
   }
 
-  // ======================================
-  // FINAL SERIAL SCORE
-  // ======================================
-
   Serial.println();
   Serial.println(
     "--------------------------------"
@@ -1027,7 +1059,7 @@ bool calibrateTouch(
   );
 
   // ======================================
-  // FINAL SCREEN
+  // RESULT SCREEN
   // ======================================
 
   tft.fillScreen(
@@ -1051,10 +1083,6 @@ bool calibrateTouch(
     8
   );
 
-  // ======================================
-  // FOUR RESULTS
-  // ======================================
-
   tft.setTextSize(1);
 
   for (
@@ -1065,8 +1093,6 @@ bool calibrateTouch(
 
     int16_t y =
       48 + (i * 42);
-
-    // DEMANDE
 
     tft.setTextColor(
       TFT_YELLOW,
@@ -1084,8 +1110,6 @@ bool calibrateTouch(
       y
     );
 
-    // REEL
-
     tft.setTextColor(
       TFT_WHITE,
       TFT_BLACK
@@ -1099,8 +1123,6 @@ bool calibrateTouch(
       85,
       y
     );
-
-    // PRECISION
 
     tft.setTextColor(
       TFT_GREEN,
@@ -1117,10 +1139,6 @@ bool calibrateTouch(
       y
     );
   }
-
-  // ======================================
-  // PRECISION MOYENNE
-  // ======================================
 
   tft.setTextSize(2);
 
@@ -1149,10 +1167,6 @@ bool calibrateTouch(
     width / 2,
     252
   );
-
-  // ======================================
-  // FINAL RESULT
-  // ======================================
 
   if (
     finalPrecision >= 95.0
@@ -1321,18 +1335,18 @@ void drawTouchTestUI(
     TFT_BLACK
   );
 
-  if (hasTouch) {
+  if (
+    hasTouch
+  ) {
 
     tft.drawString(
-      "X: " +
-      String(screenX),
+      "X: " + String(screenX),
       width / 2,
       42
     );
 
     tft.drawString(
-      "Y: " +
-      String(screenY),
+      "Y: " + String(screenY),
       width / 2,
       68
     );
@@ -1435,7 +1449,9 @@ bool testTouch(
   int16_t lastX = -1;
   int16_t lastY = -1;
 
-  while (true) {
+  while (
+    true
+  ) {
 
     if (
       touch.touched()
@@ -1443,6 +1459,47 @@ bool testTouch(
 
       TS_Point p =
         touch.getPoint();
+
+      // ==================================
+      // RAW VALIDATION
+      // ==================================
+
+      if (
+        !isValidRawTouch(p)
+      ) {
+
+        Serial.print(
+          "RAW X="
+        );
+
+        Serial.print(
+          p.x
+        );
+
+        Serial.print(
+          " RAW Y="
+        );
+
+        Serial.print(
+          p.y
+        );
+
+        Serial.print(
+          " Z="
+        );
+
+        Serial.print(
+          p.z
+        );
+
+        Serial.println(
+          " -> INVALID RAW TOUCH"
+        );
+
+        delay(20);
+
+        continue;
+      }
 
       int16_t screenX;
       int16_t screenY;
@@ -1455,8 +1512,6 @@ bool testTouch(
         screenX,
         screenY
       );
-
-      // DRAW MODE
 
       if (
         isDrawButtonPressed(
@@ -1488,8 +1543,6 @@ bool testTouch(
 
         return true;
       }
-
-      // SERIAL
 
       Serial.print(
         "RAW X="
@@ -1531,16 +1584,12 @@ bool testTouch(
         screenY
       );
 
-      // UI
-
       drawTouchTestUI(
         tft,
         screenX,
         screenY,
         true
       );
-
-      // POINT
 
       if (
         lastX >= 0 &&
